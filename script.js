@@ -188,24 +188,28 @@
     })
 
     
-    function sortTable(column, sort_asc) {
-        [...table_rows].sort((a, b) => {
-            let first_row = a.querySelectorAll('td')[column].textContent,
-                second_row = b.querySelectorAll('td')[column].textContent;
-    
-            // Parse the content based on data type
-            if (!isNaN(parseFloat(first_row)) && !isNaN(parseFloat(second_row))) {
-                first_row = parseFloat(first_row);
-                second_row = parseFloat(second_row);
-            } else if (isValidDate(first_row) && isValidDate(second_row)) {
-                first_row = new Date(first_row);
-                second_row = new Date(second_row);
-            }
-    
-            return sort_asc ? (first_row > second_row ? 1 : -1) : (first_row > second_row ? -1 : 1);
-        })
-            .map(sorted_row => document.querySelector('tbody').appendChild(sorted_row));
-    }
+ function sortTable(column, sort_asc) {
+    [...table_rows].sort((a, b) => {
+        let first_row = a.querySelectorAll('td')[column].textContent.trim(),
+            second_row = b.querySelectorAll('td')[column].textContent.trim();
+
+        // Check if the content is a number
+        const isNumber = !isNaN(parseFloat(first_row)) && !isNaN(parseFloat(second_row));
+        if (isNumber) {
+            first_row = parseFloat(first_row);
+            second_row = parseFloat(second_row);
+        }
+
+        // Compare the values
+        if (sort_asc) {
+            return isNumber ? first_row - second_row : first_row.localeCompare(second_row);
+        } else {
+            return isNumber ? second_row - first_row : second_row.localeCompare(first_row);
+        }
+    })
+    .map(sorted_row => document.querySelector('tbody').appendChild(sorted_row));
+}
+
     
 
     // 3. Converting HTML table to PDF
